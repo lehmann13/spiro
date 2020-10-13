@@ -58,6 +58,8 @@ class Experimenter(threading.Thread):
         filename = ""
         prev_daytime = self.daytime
         self.daytime = self.isDaytime()
+        # always turn on led
+        self.hw.LEDControl(True)
         
         if self.daytime:
             time.sleep(0.5)
@@ -66,8 +68,6 @@ class Experimenter(threading.Thread):
             self.cam.color_effects = None
             filename = os.path.join(self.dir, name + "-day.png")
         else:
-            # turn on led
-            self.hw.LEDControl(True)
             time.sleep(0.5)
             self.cam.shutter_speed = 1000000 // self.cfg.get('nightshutter')
             self.cam.iso = self.cfg.get('nightiso')
@@ -88,10 +88,9 @@ class Experimenter(threading.Thread):
         self.cam.shutter_speed = 0
         # we leave the cam in auto exposure mode to improve daytime assessment performance
         self.cam.exposure_mode = "auto"
-       
-        if not self.daytime:
-            # turn off led
-            self.hw.LEDControl(False)
+
+        # turn off led
+        self.hw.LEDControl(False)
 
     def run(self):
         while not self.quit:
@@ -168,6 +167,10 @@ class Experimenter(threading.Thread):
                     self.idlepos = 0
 
                 while time.time() < nextloop and not self.stop_experiment:
+                    # keep rotating while waiting, similar light conditions for each plate
+                    self.hw.motorOn(True)
+                    self.hw.halfStep(5, 0.03)
+                    self.hw.motorOn(False)
                     time.sleep(1)
 
         finally:
