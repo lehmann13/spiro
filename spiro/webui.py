@@ -365,7 +365,7 @@ def exposureMode(time):
         camera.iso = cfg.get('dayiso')
         camera.shutter_speed = 1000000 // cfg.get('dayshutter')
         camera.exposure_mode = "off"
-        hw.LEDControl(False)
+        hw.LEDControl(True)
         return redirect(url_for('exposure', time='day'))
     elif time == 'night':
         camera.iso = cfg.get('nightiso')
