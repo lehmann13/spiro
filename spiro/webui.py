@@ -228,7 +228,7 @@ def led(value):
     if value == 'on':
         hw.LEDControl(True)
     elif value == 'off':
-        hw.LEDControl(False)
+        hw.LEDControl(True)
     return redirect(url_for('index'))
 
 @not_while_running
