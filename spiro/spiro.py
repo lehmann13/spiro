@@ -42,7 +42,7 @@ options = parser.parse_args()
 def initCam():
     cam = PiCamera()
     # cam.framerate dictates longest exposure (1/cam.framerate)
-    cam.framerate = 5
+    cam.framerate = 1
     cam.iso = 50
     cam.resolution = cam.MAX_RESOLUTION
     cam.rotation = 90
