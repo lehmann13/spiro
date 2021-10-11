@@ -384,7 +384,7 @@ def exposureMode(time):
 @app.route('/shutter/<time>/<int:value>')
 def shutter(time, value):
     if time in ['day', 'night', 'live']:
-        value = max(10, min(value, 1000))
+        value = max(1, min(value, 1000))
         camera.shutter_speed = 1000000 // value
         return redirect(url_for('index'))
     else:
@@ -401,7 +401,7 @@ def exposure(time):
         shutter = request.form.get('shutter')
         if shutter:
             shutter = int(shutter)
-            shutter = max(10, min(shutter, 1000))
+            shutter = max(1, min(shutter, 1000))
             cfg.set(time + 'shutter', shutter)
             flash("New shutter speed for " + time + " images: 1/" + str(shutter))
         iso = request.form.get('iso')
