@@ -15,18 +15,28 @@ def get_version_and_cmdclass(package_path):
     return module.__version__, module.cmdclass
 
 
-version, cmdclass = get_version_and_cmdclass("spiro")
+version = "1.2.3"
+cmdclass = {}
 
-setup(name = 'spiro',
-      version = version,
-      cmdclass = cmdclass,
-      packages = find_packages(),
-      scripts = ['bin/spiro'],
-      install_requires = ['picamera==1.13', 'RPi.GPIO==0.7.1', 'Flask==2.2.5', 'waitress==2.1.2', 'numpy', 'Werkzeug==2.2.3'],
-      author = 'Jonas Ohlsson',
-      author_email = 'jonas.ohlsson@slu.se',
-      description = 'Control software for the SPIRO biological imaging system',
-      url = 'https://github.com/jonasoh/spiro',
-      include_package_data = True,
-      zip_safe = False,
-      )
+
+setup(
+    name='spiro',
+    version=version,
+    cmdclass=cmdclass,
+    packages=find_packages(),
+    scripts=['bin/spiro'],
+    install_requires=[
+        'picamera==1.13',
+        'RPi.GPIO==0.7.1',
+        'Flask==2.2.5',
+        'waitress==2.1.2',
+        'numpy',
+        'Werkzeug==2.2.3'
+    ],
+    author='Jonas Ohlsson',
+    author_email='jonas.ohlsson@slu.se',
+    description='Control software for the SPIRO biological imaging system',
+    url='https://github.com/jonasoh/spiro',
+    include_package_data=True,
+    zip_safe=False,
+)
