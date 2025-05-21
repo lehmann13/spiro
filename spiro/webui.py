@@ -456,9 +456,9 @@ def exposure(time):
         iso = request.form.get('iso')
         if iso:
             iso = int(iso)
-            iso = max(50, min(iso, 800))
+            iso = max(50, min(iso, 1600))
             cfg.set(time + 'iso', iso)
-            flash("New ISO for " + time + " images: " + str(shutter))
+            flash("New ISO for " + time + " images: " + str(iso))
 
         exposureMode(time)
         grabExposure(time)
