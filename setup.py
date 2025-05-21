@@ -15,7 +15,7 @@ def get_version_and_cmdclass(package_path):
     return module.__version__, module.cmdclass
 
 
-version = "1.2.3"
+version = "1.1.6"
 cmdclass = {}
 
 
