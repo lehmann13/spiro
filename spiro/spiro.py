@@ -40,12 +40,15 @@ options = parser.parse_args()
 
 def initCam():
     cam = PiCamera()
-    # cam.framerate dictates longest exposure (1/cam.framerate)
-    cam.framerate = 5
-    cam.iso = 50
     cam.resolution = cam.MAX_RESOLUTION
     cam.rotation = 90
     cam.image_denoise = False
+    
+    cam.framerate = 1  # 1 fps erlaubt bis zu 1 Sekunde Belichtungszeit
+    cam.shutter_speed = 1000000  # 1 Sekunde = 1_000_000 µs
+    cam.iso = 800  # für IR besser geeignet
+    cam.exposure_mode = 'off'  # manuelle Belichtungssteuerung aktivieren
+
     hw.focusCam(cfg.get('focus'))
     return cam
 
