@@ -37,17 +37,16 @@ parser.add_argument('--disable-hotspot', action="store_true", dest="disable_ap",
                     help="disables the wi-fi hotspot")
 options = parser.parse_args()
 
-
 def initCam():
     cam = PiCamera()
     cam.resolution = cam.MAX_RESOLUTION
     cam.rotation = 90
     cam.image_denoise = False
-    
-    cam.framerate = 1  # 1 fps erlaubt bis zu 1 Sekunde Belichtungszeit
-    cam.shutter_speed = 1000000  # 1 Sekunde = 1_000_000 µs
-    cam.iso = 800  # für IR besser geeignet
-    cam.exposure_mode = 'off'  # manuelle Belichtungssteuerung aktivieren
+
+    cam.framerate = 0.1  # 0.1 fps = 10 seconds per frame
+    cam.shutter_speed = 10_000_000  # 10 seconds = 10,000,000 µs
+    cam.iso = 800  # better for IR
+    cam.exposure_mode = 'off'  # enable manual exposure control
 
     hw.focusCam(cfg.get('focus'))
     return cam
