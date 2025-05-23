@@ -27,9 +27,9 @@ class Config(object):
         'focus': 250,	     # default focus distance
         'password': '',      # an empty password will trigger password initialization for web ui
         'secret': '',        # secret key for flask sessions
-        'dayshutter': 1,   # day exposure time in fractions of a second, e.g. 100 means 1/100
+        'dayshutter': 10_000_000,   # day exposure time in microseconds (e.g. 10_000_000 = 10s)
         'dayiso': 50,        # daytime iso values
-        'nightshutter': 1,  # night exposure time
+        'nightshutter': 10_000_000,  # microseconds (10 seconds)
         'nightiso': 400,     # night iso
         'name': 'spiro',     # the name of this spiro instance
         'debug': False,      # debug logging
