@@ -410,13 +410,13 @@ def experiment():
 def exposureMode(time):
     if time == 'day':
         camera.iso = cfg.get('dayiso')
-        camera.shutter_speed = 1000000 // cfg.get('dayshutter')
+        camera.shutter_speed = cfg.get('dayshutter')  # already stored in µs
         camera.exposure_mode = "off"
         hw.LEDControl(False)
         return redirect(url_for('exposure', time='day'))
     elif time == 'night':
         camera.iso = cfg.get('nightiso')
-        camera.shutter_speed = 1000000 // cfg.get('nightshutter')
+        camera.shutter_speed = cfg.get('nightshutter')
         camera.exposure_mode = "off"
         hw.LEDControl(True)
         return redirect(url_for('exposure', time='night'))
@@ -428,37 +428,39 @@ def exposureMode(time):
     abort(404)
 
 
+
 @not_while_running
 @app.route('/shutter/<time>/<int:value>')
 def shutter(time, value):
     if time in ['day', 'night', 'live']:
-        value = max(1, min(value, 1000))
-        camera.shutter_speed = 1000000 // value
+        value = max(1_000, min(value, 10_000_000))  # clamp to 1ms – 10s
+        camera.shutter_speed = value
         return redirect(url_for('index'))
     else:
         abort(404)
 
 
+
 @not_while_running
 @app.route('/exposure/<time>', methods=['GET', 'POST'])
 def exposure(time):
-    if not time in ['day', 'night']: abort(404)
-    ns=None
-    ds=None
+    if time not in ['day', 'night']:
+        abort(404)
 
     if request.method == 'POST':
         shutter = request.form.get('shutter')
         if shutter:
             shutter = int(shutter)
-            shutter = max(1, min(shutter, 1000))
+            shutter = max(1_000, min(shutter, 10_000_000))  # in µs
             cfg.set(time + 'shutter', shutter)
-            flash("New shutter speed for " + time + " images: 1/" + str(shutter))
+            flash(f"New shutter speed for {time} images: {shutter / 1_000_000:.2f} s")
+
         iso = request.form.get('iso')
         if iso:
             iso = int(iso)
             iso = max(50, min(iso, 1600))
             cfg.set(time + 'iso', iso)
-            flash("New ISO for " + time + " images: " + str(iso))
+            flash(f"New ISO for {time} images: {iso}")
 
         exposureMode(time)
         grabExposure(time)
@@ -467,14 +469,15 @@ def exposure(time):
         setLive('on')
         camera.exposure_mode = "off"
 
-    if nightshutter:
-        ns = 1000000 // nightshutter
-    if dayshutter:
-        ds = 1000000 // dayshutter
+    dayshutter = cfg.get('dayshutter')
+    nightshutter = cfg.get('nightshutter')
+    ds = dayshutter / 1_000_000 if dayshutter else None
+    ns = nightshutter / 1_000_000 if nightshutter else None
 
     return render_template('exposure.html', shutter=cfg.get(time+'shutter'), time=time, 
                            nightshutter=ns, dayshutter=ds, name=cfg.get('name'), iso=camera.iso,
                            dayiso=cfg.get('dayiso'), nightiso=cfg.get('nightiso'))
+
 
 
 @not_while_running
