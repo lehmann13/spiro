@@ -39,7 +39,7 @@ class Experimenter(threading.Thread):
         oldres = self.cam.resolution
         self.cam.resolution = (320, 240)
         self.cam.iso = self.cfg.get('dayiso')
-        self.cam.shutter_speed = 1000000 // self.cfg.get('dayshutter')
+        self.cam.shutter_speed = self.cfg.get('dayshutter')  # Already in µs
         output = np.empty((240, 320, 3), dtype=np.uint8)
         self.cam.capture(output, 'rgb')
         self.cam.resolution = oldres
@@ -63,13 +63,13 @@ class Experimenter(threading.Thread):
         
         if self.daytime:
             time.sleep(0.5)
-            self.cam.shutter_speed = 1000000 // self.cfg.get('dayshutter')
+            self.cam.shutter_speed = self.cfg.get('dayshutter')  # Already in µs
             self.cam.iso = self.cfg.get('dayiso')
             self.cam.color_effects = None
             filename = os.path.join(self.dir, name + "-day.png")
         else:
             time.sleep(0.5)
-            self.cam.shutter_speed = 1000000 // self.cfg.get('nightshutter')
+            self.cam.shutter_speed = self.cfg.get('nightshutter')
             self.cam.iso = self.cfg.get('nightiso')
             #self.cam.color_effects = (128, 128)
             filename = os.path.join(self.dir, name + "-night.png")
