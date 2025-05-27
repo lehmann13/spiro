@@ -363,13 +363,13 @@ def experiment():
 def exposureMode(time):
     if time == 'day':
         camera.iso = cfg.get('dayiso')
-        camera.shutter_speed = 1000000 // cfg.get('dayshutter')
+        camera.shutter_speed = cfg.get('dayshutter')
         camera.exposure_mode = "off"
         hw.LEDControl(True)
         return redirect(url_for('exposure', time='day'))
     elif time == 'night':
         camera.iso = cfg.get('nightiso')
-        camera.shutter_speed = 1000000 // cfg.get('nightshutter')
+        camera.shutter_speed = cfg.get('nightshutter')
         camera.exposure_mode = "off"
         hw.LEDControl(True)
         return redirect(url_for('exposure', time='night'))
@@ -384,8 +384,9 @@ def exposureMode(time):
 @app.route('/shutter/<time>/<int:value>')
 def shutter(time, value):
     if time in ['day', 'night', 'live']:
-        value = max(1, min(value, 1000))
-        camera.shutter_speed = 1000000 // value
+        # Limit value between 1 microsecond and 6,000,000 microseconds (6 seconds)
+        value = max(1, min(value, 6000000))
+        camera.shutter_speed = value  # set shutter speed directly (in microseconds)
         return redirect(url_for('index'))
     else:
         abort(404)
@@ -393,23 +394,34 @@ def shutter(time, value):
 @not_while_running
 @app.route('/exposure/<time>', methods=['GET', 'POST'])
 def exposure(time):
-    if not time in ['day', 'night']: abort(404)
-    ns=None
-    ds=None
+    if time not in ['day', 'night']:
+        abort(404)
+    ns = None
+    ds = None
 
     if request.method == 'POST':
-        shutter = request.form.get('shutter')
-        if shutter:
-            shutter = int(shutter)
-            shutter = max(1, min(shutter, 1000))
-            cfg.set(time + 'shutter', shutter)
-            flash("New shutter speed for " + time + " images: 1/" + str(shutter))
+        shutter_sec = request.form.get('shutter')
+        if shutter_sec:
+            try:
+                shutter_sec = float(shutter_sec)
+                # Convert seconds to microseconds
+                shutter_us = int(shutter_sec * 1_000_000)
+                # Clamp between 1 microsecond and 6,000,000 microseconds (6 seconds)
+                shutter_us = max(1, min(shutter_us, 6_000_000))
+                cfg.set(time + 'shutter', shutter_us)
+                flash(f"New shutter speed for {time} images: {shutter_sec:.6f} seconds")
+            except ValueError:
+                flash("Invalid shutter speed entered. Please enter a number in seconds.")
+
         iso = request.form.get('iso')
         if iso:
-            iso = int(iso)
-            iso = max(50, min(iso, 800))
-            cfg.set(time + 'iso', iso)
-            flash("New ISO for " + time + " images: " + str(shutter))
+            try:
+                iso = int(iso)
+                iso = max(50, min(iso, 800))
+                cfg.set(time + 'iso', iso)
+                flash(f"New ISO for {time} images: {iso}")
+            except ValueError:
+                flash("Invalid ISO value entered.")
 
         exposureMode(time)
         grabExposure(time)
@@ -419,13 +431,15 @@ def exposure(time):
         camera.exposure_mode = "off"
 
     if nightshutter:
-        ns = 1000000 // nightshutter
+        ns = nightshutter / 1_000_000  # convert to seconds
     if dayshutter:
-        ds = 1000000 // dayshutter
+        ds = dayshutter / 1_000_000  # convert to seconds
 
-    return render_template('exposure.html', shutter=cfg.get(time+'shutter'), time=time, 
+    return render_template('exposure.html', shutter=cfg.get(time + 'shutter') / 1_000_000, time=time, 
                            nightshutter=ns, dayshutter=ds, name=cfg.get('name'), iso=camera.iso,
                            dayiso=cfg.get('dayiso'), nightiso=cfg.get('nightiso'))
+
+
 
 @not_while_running
 @app.route('/calibrate', methods=['GET', 'POST'])
