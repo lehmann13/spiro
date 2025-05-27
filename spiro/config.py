@@ -22,7 +22,7 @@ class Config(object):
         'focus': 250,	     # default focus distance
         'password': '',      # an empty password will trigger password initialization for web ui
         'secret': '',        # secret key for flask sessions
-        'dayshutter':  6000000, # 6 seconds in microseconds
+        'dayshutter':  10000, # 10 ms in microseconds
         'dayiso': 50,        # daytime iso values
         'nightshutter': 6000000,  # 6 seconds in microseconds
         'nightiso': 400,     # night iso
