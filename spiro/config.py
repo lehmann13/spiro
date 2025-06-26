@@ -24,7 +24,7 @@ class Config(object):
         'secret': '',        # secret key for flask sessions
         'dayshutter':  10000, # 10 ms in microseconds
         'dayiso': 50,        # daytime iso values
-        'nightshutter': 100000,  # 100 ms in microseconds
+        'nightshutter': 6000000,  # 6 seconds in microseconds
         'nightiso': 400,     # night iso
         'name': 'spiro',     # the name of this spiro instance
         'debug': False,      # debug logging
