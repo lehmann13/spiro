@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 setup(name = 'spiro',
-      version = '1.0b2',
+      version = 'v1.1.6',
       packages = find_packages(),
       scripts = ['bin/spiro'],
       install_requires = ['picamera==1.13', 'RPi.GPIO==0.7.1', 'Flask==2.2.5', 'waitress==2.1.2', 'numpy', 'Werkzeug==2.2.3'],
