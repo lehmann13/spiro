@@ -73,6 +73,11 @@ class Experimenter(threading.Thread):
             self.cam.iso = self.cfg.get('nightiso')
             #self.cam.color_effects = (128, 128)
             filename = os.path.join(self.dir, name + "-night.png")
+       
+        exposure_us = self.cam.shutter_speed
+        exposure_sec = exposure_us / 1_000_000
+        debug(f"Sleeping for {exposure_sec:.2f} seconds to allow long exposure.")
+        time.sleep(exposure_sec + 0.2)  # Let the sensor gather light
         
         if prev_daytime != self.daytime and self.daytime and self.cam.awb_mode != "off":
             # if there is a daytime shift, AND it is daytime, AND white balance was not previously set,
